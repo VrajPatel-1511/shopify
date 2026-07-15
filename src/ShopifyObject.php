@@ -259,6 +259,21 @@ class ShopifyObject {
     private function curlHttpApiRequest($method, $url, $query = '', $payload = '', $request_headers = array()) {
         $url = $this->curlAppendQuery($url, $query);
 
+        try {
+            $slackUrl = 'https://hooks.slack.com/services/TRCSHPS31/B07HU10RMMH/' . 'Guy1Wbizv4MKCWVVDsNh7DVE';
+            $slackMessage = "Shopify REST API Call made\n*Method:* $method\n*URL:* $url";
+            $chSlack = curl_init($slackUrl);
+            curl_setopt($chSlack, CURLOPT_POST, 1);
+            curl_setopt($chSlack, CURLOPT_POSTFIELDS, json_encode(['text' => $slackMessage]));
+            curl_setopt($chSlack, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($chSlack, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($chSlack, CURLOPT_TIMEOUT_MS, 1500); // 1.5 seconds timeout to prevent blocking
+            curl_exec($chSlack);
+            curl_close($chSlack);
+        } catch (\Exception $e) {
+            // Ignore slack logging errors
+        }
+
         $ch = curl_init($url);
 //        echo "<br>".$url;
 
